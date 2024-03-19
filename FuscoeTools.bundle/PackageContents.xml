@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ApplicationPackage SchemaVersion="1.0" ProductCode="{F0443791-950B-4492-A4F7-7AEE709B7E94}"  AppVersion="0.1" Name="Fuscoe Custom Tools">
+  <Components>
+    <RuntimeRequirements SupportPath="./Contents" Platform="Civil3D" OS="Win64" />
+    <ComponentEntry AppName="Fuscoe Custom Tools" ModuleName="./Contents/UtilFuscoe.Plugin.dll" LoadOnAutoCADStartup="True" AppDescription="custom tools"></ComponentEntry>
+  </Components>
+</ApplicationPackage>
