@@ -80,11 +80,13 @@ namespace generalMethods
                 BlockTableRecord acBlkTblRec = transaction.GetObject(acBlkTbl[BlockTableRecord.ModelSpace],
                                                 OpenMode.ForWrite) as BlockTableRecord;
 
-                var p1 = doc.Editor.GetPoint("first corner");
+                var p1 = doc.Editor.GetPoint("specify first corner");
+                var p2 = doc.Editor.GetCorner("specify opposite corner", p1.Value);
                 using (MText acMText = new MText())
                 {
                     acMText.Location = p1.Value;
                     acMText.Contents = "";
+                    //acMText.Width = p2.Value.Y - p1.Value.Y;
                     acMText.TextHeight = docScale *.1;
                     acMText.Rotation = (double)snapang;
                     acBlkTblRec.AppendEntity(acMText);

@@ -4,6 +4,9 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
+using Autodesk.Civil.ApplicationServices;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace LabelTest
@@ -184,8 +187,66 @@ namespace solar
         {
             solarFunctions.processBlockPiles();
         }
+        [CommandMethod("processGlobalPiles")]
+        public void GlobalPilesCommand()
+        {
+            solarFunctions.processGlobalPiles();
+        }
+        [CommandMethod("processPilesAuto")]
+        public void PilesAutoCommand()
+        {
+            solarFunctionsAuto.processAllPilesAuto();
+        }
 
-        
+        [CommandMethodAttribute("typeTest")]
+        public void typeTest()
+        {
+            var doc = Application.DocumentManager.MdiActiveDocument;
+            using (Transaction transaction = doc.Database.TransactionManager.StartTransaction())
+            {
+                //var options = new PromptEntityOptions("\nSelect contour to label");
+
+                //var polylineResult = doc.Editor.GetEntity(options);
+                //Autodesk.AutoCAD.DatabaseServices.DBObject obj = transaction.GetObject(polylineResult.ObjectId, OpenMode.ForRead);
+                ////check for type, if polyline get standard pile blocks within, if block then process as global pile
+                //Type objType = obj.GetType();
+                CivilDocument doca = CivilApplication.ActiveDocument;
+                Editor ed = doc.Editor;
+
+                //https://help.autodesk.com/view/CIV3D/2024/ENU/?guid=d280ff4f-4c4b-f910-7a27-0e787a43448f
+                PromptPointResult pointResult = ed.GetPoint("\nEnter a point to get elevation: ");
+                if (pointResult.Status != PromptStatus.OK) return;
+                Point3d point = pointResult.Value;
+
+                var surfaceId = doca.GetSurfaceIds(); // Assuming the first surface in the drawing
+                Dictionary<string, ObjectId> surfaces = new Dictionary<string, ObjectId>();
+                Document acDoc = Application.DocumentManager.MdiActiveDocument;
+
+                PromptKeywordOptions pKeyOpts = new PromptKeywordOptions("");
+                pKeyOpts.Message = "\npick a surface ";
+                
+                
+                pKeyOpts.AllowNone = false;
+
+                
+                for (int i = 0; i < surfaceId.Count; i++)
+                {
+                    Autodesk.Civil.DatabaseServices.TinSurface surface = transaction.GetObject(surfaceId[i], OpenMode.ForRead) as Autodesk.Civil.DatabaseServices.TinSurface;
+                    surfaces[surface.Name] = surfaceId[i];
+                    pKeyOpts.Keywords.Add(surface.Name);
+                }
+                PromptResult pKeyRes = acDoc.Editor.GetKeywords(pKeyOpts);
+
+                Application.ShowAlertDialog("Entered keyword: " +
+                                            pKeyRes.StringResult);
+                // Get elevation at the specified XY location
+                //double elevation = surface.FindElevationAtXY(point.X, point.Y);
+                //ed.WriteMessage($"\nThe elevation at X: {point.X}, Y: {point.Y} is: {elevation}");
+                transaction.Commit();
+            }
+        }
+
+
     }
 }
 
